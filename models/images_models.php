@@ -10,23 +10,21 @@ class ImagesModel {
     }
 
     // Stocke l'image avec id_user
-    public function setImageInput($image_input, $image_output, $user_id) {
-        $sql = "INSERT INTO images (image_input, image_output, user_id) VALUES (?, ?, ?)";
-        $stmt = mysqli_prepare($this->conn, $sql);
-
-        // BLOB pour image_input
-        mysqli_stmt_bind_param($stmt, "bsi", $null, $image_output, $user_id);
-        mysqli_stmt_send_long_data($stmt, 0, $image_input);
-        mysqli_stmt_execute($stmt);
+    public function saveImageName($image_name, $user_id) {
+        $sql = "INSERT INTO images (identifiant, id_user) VALUES (?, ?)";
+        $request = mysqli_prepare($this->conn, $sql);
+        mysqli_stmt_bind_param($request, "si", $image_name, $user_id);
+        $result = mysqli_stmt_execute($request);
+        return $result;
     }
 
     // Récupère toutes les images d'un utilisateur
     public function getLastImageByUser($user_id) {
-        $sql = "SELECT id, image_input FROM images WHERE user_id = ? ORDER BY id DESC LIMIT 1";
-        $stmt = mysqli_prepare($this->conn, $sql);
-        mysqli_stmt_bind_param($stmt, "i", $user_id);
-        mysqli_stmt_execute($stmt);
-        $result = mysqli_stmt_get_result($stmt);
-        return mysqli_fetch_assoc($result); // retourne un seul résultat
+        $sql = "SELECT identifiant FROM images WHERE id_user = ? ORDER BY id DESC LIMIT 1";
+        $request = mysqli_prepare($this->conn, $sql);
+        mysqli_stmt_bind_param($request, "i", $user_id);
+        mysqli_stmt_execute($request);
+        $result = mysqli_stmt_get_result($request);
+        return $result;
     }
 }

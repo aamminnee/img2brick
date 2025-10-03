@@ -8,17 +8,17 @@ class UsersModel {
     }
 
     public function getUserByUsername($username) {
-        $stmt = mysqli_prepare($this->conn, "SELECT id, password FROM user WHERE username=?");
-        mysqli_stmt_bind_param($stmt,"s",$username);
-        mysqli_stmt_execute($stmt);
-        $res = mysqli_stmt_get_result($stmt);
-        return mysqli_fetch_assoc($res);
+        $request = mysqli_prepare($this->conn, "SELECT id, mdp FROM user WHERE username = ?");
+        mysqli_stmt_bind_param($request,"s",$username);
+        mysqli_stmt_execute($request);
+        $res = mysqli_stmt_get_result($request);
+        $res->fetch_assoc();
     }
 
     public function addUser($email,$username,$password) {
-        $hashed = password_hash($password,PASSWORD_DEFAULT);
-        $stmt = mysqli_prepare($this->conn,"INSERT INTO user (email, username, password) VALUES (?,?,?)");
-        mysqli_stmt_bind_param($stmt,"sss",$email,$username,$hashed);
-        return mysqli_stmt_execute($stmt);
+        $hashed = password_hash($password, PASSWORD_DEFAULT);
+        $request = mysqli_prepare($this->conn, "INSERT INTO user (email, username, mdp) VALUES (?,?,?)");
+        mysqli_stmt_bind_param($request,"sss",$email,$username,$hashed);
+        return mysqli_stmt_execute($request);
     }
 }

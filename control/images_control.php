@@ -17,23 +17,42 @@ class ImagesController {
                 header("Location: ../views/user_views.php");
                 exit;
             }
-
             $image = $_FILES['image_input'];
-            $imageData = file_get_contents($image['tmp_name']);
-            $this->images_model->setImageInput($imageData, null, $_SESSION['user_id']);
-
-            echo "<p>Image enregistrée avec succès ✅</p>";
-
-            // Récupère seulement la dernière image de l'utilisateur
-            $lastImage = $this->images_model->getLastImageByUser($_SESSION['user_id']);
-            if ($lastImage) {
-                $base64 = base64_encode($lastImage['image_input']);
-                echo "<img src='data:image/png;base64,$base64' style='max-width:200px; margin:5px;'>";
+            $identifantImage = $this->generateImageName($image);
+            if ($identifantImage === null) {
+                header("Location: ../views/images_views.php");
+                exit;
             }
+            $this->saveImage($image, $identifantImage);
         }
     }
 
+    private function generateImageName($image) {
+        $uniqueName = null;
+        $extension = pathinfo($image['name'], PATHINFO_EXTENSION); // Récupérer l'extension du fichier
+        if ($extension === 'png') {
+            $uniqueName = uniqid('img_', true) . '.png';  // Générer un nom unique
+        } else {
+            echo "<p> Format supporté : png uniquement. </p>";
+        }
+        return $uniqueName;
+    }
+
+    private function saveImage($image, $uniqueName) {
+    // Chemin complet où stocker l'image
+    $uploadDir = __DIR__ . '/../uploads/';  // remonte d'un dossier vers uploads/
+    $uploadPath = $uploadDir . $uniqueName;
+    if (move_uploaded_file($image['tmp_name'], $uploadPath)) {
+        echo "Image uploadée avec succès !";
+        $this->images_model->saveImageName($uniqueName, $_SESSION['user_id']);
+        $_SESSION['image'] = $uniqueName; 
+    } else {
+        echo "Erreur lors de l'upload.";
+    }
 }
+ 
+}
+
 
 $controller = new ImagesController();
 if (isset($_POST['upload'])) {

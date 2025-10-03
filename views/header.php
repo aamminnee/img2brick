@@ -14,9 +14,10 @@ if (session_status() === PHP_SESSION_NONE) {
 <?php if(isset($_SESSION['username'])): ?>
     <p>Connecté en tant que : <strong><?= htmlspecialchars($_SESSION['username']) ?></strong> | 
     <a href="../control/user_control.php?action=logout">Déconnexion</a> | 
-    <a href="../control/commande_controller.php?action=view">Mon Panier</a></p>
+    <a href="#">Mon Panier</a></p>
 <?php else: ?>
-    <p><a href="../views/user_views.php">Connexion</a></p>
+    <p><a href="../views/login_views.php">Connexion</a></p>
+    <p><a href="../views/register_views.php">Inscription</a></p>
 <?php endif; ?>
 <hr>
 </header>
