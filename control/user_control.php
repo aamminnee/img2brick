@@ -9,29 +9,28 @@ class UserController {
         $this->user_model = new UsersModel();
     }
 
+    // Login
     public function login() {
         if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['username']) && isset($_POST['password'])) {
             $username = $_POST['username'];
             $password = $_POST['password'];
-
             $user = $this->user_model->getUserByUsername($username);
             if ($user && password_verify($password, $user['mdp'])) {
                 $_SESSION['username'] = $username;
-                $_SESSION['user_id'] = $user['id'];
+                $_SESSION['user_id'] = $user['id_user']; 
                 header("Location: ../views/images_views.php");
                 exit;
             } else {
-                $message = "Nom d'utilisateur ou mot de passe incorrect";
+                $message = "Incorrect username or password";
                 include __DIR__ . '/../views/login_views.php';
             }
-        } elseif (isset($_GET['action']) && $_GET['action'] == 'logout') {
-            $this->logout();
         } else {
             include __DIR__ . '/../views/login_views.php';
         }
     }
 
-    public  function register() {
+    // Register
+    public function register() {
         if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['email']) && isset($_POST['username']) && isset($_POST['password'])) {
             $email = $_POST['email'];
             $username = $_POST['username'];
@@ -41,7 +40,7 @@ class UserController {
                 header("Location: ../views/login_views.php");
                 exit;
             } else {
-                $message = "Erreur lors de l'inscription. Veuillez réessayer.";
+                $message = "Registration failed. Please try again.";
                 include __DIR__ . '/../views/register_views.php';
             }
         } else {
@@ -49,19 +48,19 @@ class UserController {
         }
     }
 
+    // Logout
     public function logout() {
         session_unset();
         session_destroy();
-        header("Location: ../views/images_views.php");
+        include __DIR__ . '/../views/images_views.php';
         exit;
     }
 }
-
-$controller = new ImagesController();
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
-    if ($_POST['action'] === 'login') {
+$controller = new UserController();
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (isset($_POST['login'])) {
         $controller->login();
-    } elseif ($_POST['action'] === 'register') {
+    } elseif (isset($_POST['register'])) {
         $controller->register();
     }
 }
