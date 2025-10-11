@@ -1,12 +1,9 @@
 <?php 
 session_start();
-if (!isset($_SESSION['user_id'])) {
-    header("Location: ../views/login_views.php");
-    exit;
-}
+
 include __DIR__ . '/header.php'; 
 ?>
-
+  
 <h2>Upload an Image</h2>
 
 <!-- Formulaire classique -->
