@@ -41,4 +41,11 @@ class UsersModel {
         mysqli_stmt_bind_param($request, "i", $id_user);
         return mysqli_stmt_execute($request);
     }
+
+    public function resetPassword($id_user, $password) {
+        $hashed = password_hash($password, PASSWORD_DEFAULT);
+        $request = mysqli_prepare($this->conn, "UPDATE user SET mdp = ? WHERE id_user = ?");
+        mysqli_stmt_bind_param($request, "si", $hashed, $id_user);
+        return mysqli_stmt_execute($request);
+    }
 }

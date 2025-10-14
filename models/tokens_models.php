@@ -32,8 +32,9 @@ class TokensModel {
 
     // delete a token
     public function deleteToken($id_token) {
-        $request = mysqli_prepare($this->conn, "DELETE FROM tokens WHERE id_token = ?");
-        mysqli_stmt_bind_param($request, "i", $id_token);
+        $now = date('Y-m-d H:i:s');
+        $request = mysqli_prepare($this->conn, "DELETE FROM tokens WHERE expires_at < ?");
+        mysqli_stmt_bind_param($request, "i", $now);
         mysqli_stmt_execute($request);
     }
 }
