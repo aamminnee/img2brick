@@ -1,6 +1,7 @@
 <?php
 
 class TokensModel {
+    
     private $conn;
 
     public function __construct() {
@@ -31,7 +32,7 @@ class TokensModel {
     }
 
     // delete a token
-    public function deleteToken($id_token) {
+    public function deleteToken() {
         $now = date('Y-m-d H:i:s');
         $request = mysqli_prepare($this->conn, "DELETE FROM tokens WHERE expires_at < ?");
         mysqli_stmt_bind_param($request, "i", $now);

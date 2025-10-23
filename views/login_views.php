@@ -1,18 +1,24 @@
-<?php if (isset($message)) echo "<p>$message</p>"; ?>
+<?php 
+if (isset($message)) echo "<p>$message</p>"; 
+?>
+
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="<?= $_SESSION['lang'] ?? 'fr' ?>">
 <head>
     <meta charset="UTF-8">
-    <title>Connexion utilisateur</title>    
+    <title><?= $t['login_title'] ?? 'User Login' ?></title>    
 </head>
 <body>
-    <h2>Connexion</h2>
+    <h2><?= $t['login_header'] ?? 'Login' ?></h2>
+
     <form action="../control/user_control.php" method="post">
-        <label for="username">Nom d'utilisateur</label>
+        <label for="username"><?= $t['username_label'] ?? 'Username' ?></label>
         <input type="text" name="username" id="username" required>
-        <label for="password">Mot de passe</label>
+
+        <label for="password"><?= $t['password_label'] ?? 'Password' ?></label>
         <input type="password" name="password" id="password" required>
-        <button type="submit" name="login">Se connecter</button>
+
+        <button type="submit" name="login"><?= $t['login_button'] ?? 'Login' ?></button>
     </form>
 </body>
 </html>

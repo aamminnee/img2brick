@@ -3,20 +3,20 @@ session_start();
 
 include __DIR__ . '/header.php'; 
 ?>
-  
-<h2>Upload an Image</h2>
 
-<!-- Formulaire classique -->
+<h2><?= $t['upload_title'] ?? 'Upload an Image' ?></h2>
+
+<!-- Classic Upload Form -->
 <form action="../control/images_control.php" method="post" enctype="multipart/form-data">
-    <label for="image_input">Image</label>
+    <label for="image_input"><?= $t['image_label'] ?? 'Image' ?></label>
     <input type="file" name="image_input" id="image_input" accept="image/*" required>
-    <button type="submit" name="upload">Upload</button>
+    <button type="submit" name="upload"><?= $t['upload_button'] ?? 'Upload' ?></button>
 </form>
 
-<h3>Drag and drop a PNG file below</h3>
+<h3><?= $t['drag_title'] ?? 'Drag and drop a PNG file below' ?></h3>
 
 <div id="zone" style="width:300px;height:150px;border:2px dashed gray;text-align:center;line-height:150px;border-radius:10px;">
-  Drop your PNG file here
+  <?= $t['drag_here'] ?? 'Drop your PNG file here' ?>
 </div>
 
 <div id="message"></div>
@@ -37,13 +37,13 @@ zone.addEventListener("drop", (event) => {
   const files = event.dataTransfer.files;
 
   if (files.length === 0) {
-    message.textContent = "No file detected.";
+    message.textContent = "<?= $t['no_file_detected'] ?? 'No file detected.' ?>";
     preview.innerHTML = "";
     return;
   }
 
   if (files.length > 1) {
-    message.textContent = "Please drop only one file at a time.";
+    message.textContent = "<?= $t['only_one_file'] ?? 'Please drop only one file at a time.' ?>";
     preview.innerHTML = "";
     return;
   }
@@ -51,12 +51,12 @@ zone.addEventListener("drop", (event) => {
   const file = files[0];
 
   if (file.type !== "image/png") {
-    message.textContent = "Error: Only PNG format is allowed.";
+    message.textContent = "<?= $t['png_only'] ?? 'Error: Only PNG format is allowed.' ?>";
     preview.innerHTML = "";
     return;
   }
 
-  message.textContent = "Valid PNG file!";
+  message.textContent = "<?= $t['valid_png'] ?? 'Valid PNG file!' ?>";
   preview.innerHTML = "";
 
   const img = document.createElement("img");
@@ -65,7 +65,7 @@ zone.addEventListener("drop", (event) => {
   img.style.display = "block";
   preview.appendChild(img);
 
-  // Upload via AJAX pour drag & drop
+  // AJAX upload for drag & drop
   const formData = new FormData();
   formData.append("image_input", file);
   formData.append("upload", true);
@@ -79,7 +79,7 @@ zone.addEventListener("drop", (event) => {
     message.textContent += " | " + data;
   })
   .catch(err => {
-    message.textContent = "Erreur lors de l'upload: " + err;
+    message.textContent = "<?= $t['upload_error'] ?? 'Error during upload:' ?> " + err;
   });
 });
 </script>
