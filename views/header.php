@@ -41,10 +41,19 @@ $t = $translationModel->getTranslations($lang);
         </a>
     </p>
 <?php endif; ?>
-
 <p>
     <a href="../control/setting_control.php">
         <?= $t['settings'] ?? 'Paramètres' ?>
+    </a>
+</p>
+<p>
+    <a href="../views/images_views.php">
+        <?= $t['home'] ?? 'Acceuil' ?>
+    </a>
+</p>
+<p>
+    <a href="../views/compte_views.php">
+        <?= $t['my_account'] ?? 'My Account' ?>
     </a>
 </p>
 <hr>

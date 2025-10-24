@@ -18,6 +18,14 @@ class UsersModel {
         return $res->fetch_assoc();
     }
 
+    public function getUsernameById($id_user) {
+        $request = mysqli_prepare($this->conn, "SELECT username FROM users WHERE id_user = ?");
+        mysqli_stmt_bind_param($request, "i", $id_user);
+        mysqli_stmt_execute($request);
+        $res = mysqli_stmt_get_result($request);
+        return $res->fetch_assoc();
+    }
+
     // get user status by id
     public function getStatusById($id_user) {
         $request = mysqli_prepare($this->conn, "SELECT etat FROM users WHERE id_user = ?");
@@ -27,7 +35,7 @@ class UsersModel {
         return $res->fetch_assoc();
     }
 
-    // add user 
+    // add user in database
     public function addUser($email, $username, $password) {
         $hashed = password_hash($password, PASSWORD_DEFAULT);
         $request = mysqli_prepare($this->conn, "INSERT INTO users (email, username, etat, mdp) VALUES (?, ?, 'invalide', ?)");
@@ -42,10 +50,20 @@ class UsersModel {
         return mysqli_stmt_execute($request);
     }
 
-    public function resetPassword($id_user, $password) {
+    // update user password
+    public function setPassword($id_user, $password) {
         $hashed = password_hash($password, PASSWORD_DEFAULT);
         $request = mysqli_prepare($this->conn, "UPDATE users SET mdp = ? WHERE id_user = ?");
         mysqli_stmt_bind_param($request, "si", $hashed, $id_user);
         return mysqli_stmt_execute($request);
+    }
+
+    // get user email by id
+    public function getEmaiById($id_user) {
+        $request = mysqli_prepare($this->conn, "SELECT email FROM users WHERE id_user = ?");
+        mysqli_stmt_bind_param($request, "i", $id_user);
+        mysqli_stmt_execute($request);
+        $res = mysqli_stmt_get_result($request);
+        return $res->fetch_assoc();
     }
 }

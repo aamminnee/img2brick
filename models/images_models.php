@@ -19,10 +19,10 @@ class ImagesModel {
     }
 
     // Récupère toutes les images d'un utilisateur
-    public function getLastImageByUser($user_id) {
-        $sql = "SELECT identifiant FROM images WHERE id_user = ? ORDER BY id DESC LIMIT 1";
+    public function getLastImageByUser($user_id, $limit = 6) {
+        $sql = "SELECT identifiant FROM images WHERE id_user = ? ORDER BY id DESC LIMIT ?";
         $request = mysqli_prepare($this->conn, $sql);
-        mysqli_stmt_bind_param($request, "i", $user_id);
+        mysqli_stmt_bind_param($request, "ii", $user_id, $limit);
         mysqli_stmt_execute($request);
         $result = mysqli_stmt_get_result($request);
         return $result;

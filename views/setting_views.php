@@ -1,3 +1,6 @@
+<?php 
+include __DIR__ . '/header.php'; 
+?>
 <!DOCTYPE html>
 <html lang="<?= $_SESSION['lang'] ?? 'fr' ?>">
 <head>
@@ -39,8 +42,8 @@
 
     <div class="setting-item">
         <h3><?= $t['language'] ?? 'Language' ?></h3>
-        <a href="?action=setLanguage&lang=fr" class="button">🇫🇷 Français</a>
-        <a href="?action=setLanguage&lang=en" class="button">🇬🇧 English</a>
+        <a href="?action=setLanguage&lang=fr" class="button">Français</a>
+        <a href="?action=setLanguage&lang=en" class="button">English</a>
     </div>
 
     <div class="setting-item">
@@ -49,9 +52,11 @@
         <a href="?action=setTheme&theme=dark" class="button"><?= $t['dark'] ?? 'Dark' ?></a>
     </div>
 
-    <div class="setting-item">
+   <div class="setting-item">
+    <?php if (isset($_SESSION['username'])): ?>
         <h3><?= $t['account'] ?? 'Account' ?></h3>
-        <a href="../views/compte.php" class="button">👤 <?= $t['my_account'] ?? 'My Account' ?></a>
+        <a href="../views/compte_views.php" class="button"><?= $t['my_account'] ?? 'My Account' ?></a>
+    <?php endif; ?>
     </div>
 </div>
 </body>

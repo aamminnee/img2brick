@@ -1,12 +1,21 @@
 <?php 
 if (isset($message)) echo "<p>$message</p>"; 
+include __DIR__ . '/header.php';
 ?>
 
 <!DOCTYPE html>
 <html lang="<?= $_SESSION['lang'] ?? 'fr' ?>">
 <head>
-    <meta charset="UTF-8">
     <title><?= $t['login_title'] ?? 'User Login' ?></title>    
+    <meta charset="UTF-8">
+      <style>
+          body {
+              font-family: Arial, sans-serif;
+              background-color: <?= ($_SESSION['theme'] ?? 'light') === 'dark' ? '#121212' : '#f5f5f5' ?>;
+              color: <?= ($_SESSION['theme'] ?? 'light') === 'dark' ? '#fff' : '#000' ?>;
+              transition: all 0.3s ease;
+          }
+    </style>
 </head>
 <body>
     <h2><?= $t['login_header'] ?? 'Login' ?></h2>

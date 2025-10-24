@@ -9,7 +9,7 @@ class TranslationModel {
         }
     }
 
-    // Récupère les traductions selon la langue
+    // get translations for a given language
     public function getTranslations($lang) {
         $query = "SELECT key_name, texte FROM translations WHERE lang = ?";
         $stmt = $this->conn->prepare($query);

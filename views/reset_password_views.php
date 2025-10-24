@@ -1,9 +1,20 @@
-<?php if (isset($message)) echo "<p>$message</p>"; ?>
+<?php 
+if (isset($message)) echo "<p>$message</p>"; 
+Require_once __DIR__ . '/header.php';
+?>
 <!DOCTYPE html>
 <html lang="<?= $_SESSION['lang'] ?? 'fr' ?>">
 <head>
     <meta charset="UTF-8">
-    <title><?= $t['reset_password_title'] ?? 'Reset your password' ?></title>    
+    <title><?= $t['reset_password_title'] ?? 'Reset your password' ?></title>  
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: <?= ($_SESSION['theme'] ?? 'light') === 'dark' ? '#121212' : '#f5f5f5' ?>;
+            color: <?= ($_SESSION['theme'] ?? 'light') === 'dark' ? '#fff' : '#000' ?>;
+            transition: all 0.3s ease;
+          }
+    </style> 
 </head>
 <body>
     <h2><?= $t['reset_password_header'] ?? 'Reset Password' ?></h2>

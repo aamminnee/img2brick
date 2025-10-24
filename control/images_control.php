@@ -9,12 +9,12 @@ class ImagesController {
         $this->images_model = new ImagesModel();
     }
 
+    // Handle image upload
     public function uploadImage() {
         if (!isset($_SESSION['user_id'])) {
             echo "Vous devez être connecté.";
             exit;
         }
-
         if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['image_input'])) {
             $image = $_FILES['image_input'];
             $uniqueName = $this->generateImageName($image);
@@ -26,6 +26,7 @@ class ImagesController {
         }
     }
 
+    // Generate a unique image name
     private function generateImageName($image) {
         $extension = strtolower(pathinfo($image['name'], PATHINFO_EXTENSION));
         if ($extension === 'png') {
@@ -34,10 +35,10 @@ class ImagesController {
         return null;
     }
 
+    // Save image to uploads folder and database
     private function saveImage($image, $uniqueName) {
         $uploadDir = __DIR__ . '/../uploads/';
         $uploadPath = $uploadDir . $uniqueName;
-
         if (move_uploaded_file($image['tmp_name'], $uploadPath)) {
             $this->images_model->saveImageName($uniqueName, $_SESSION['user_id']);
             echo "Image uploadée avec succès !";
