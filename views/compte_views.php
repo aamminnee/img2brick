@@ -99,6 +99,7 @@ require_once __DIR__ . '/../models/images_models.php';
         <p><?= $t['username'] ?? 'Username' ?>: <strong><?= $_SESSION['username'] ?? 'N/A' ?></strong></p>
         <p><?= $t['email'] ?? 'Email' ?>: <strong><?= $_SESSION['email'] ?? 'N/A' ?></strong></p>
         <p><?= $t['status'] ?? 'Status' ?>: <strong><?= $_SESSION['status'] ?? 'N/A' ?></strong></p>
+        <p>Mode : <strong><?= $_SESSION['mode'] ?? 'NULL' ?></strong></p>
         <?php if (isset($_SESSION['status']) && $_SESSION['status'] === 'invalide'): ?>
             <a href="../control/user_control.php?action=validateEmail" class="button">
                 <?= $t['valide_email'] ?? 'Valide Email' ?>
@@ -110,17 +111,25 @@ require_once __DIR__ . '/../models/images_models.php';
          <?php endif; ?>
     </div>
 
-    <!-- Section Two-Factor Authentication -->
     <div class="section">
         <h3><?= $t['two_factor_auth'] ?? 'Two-Factor Authentication' ?></h3>
-        <label class="toggle-switch">
-            <input type="checkbox" id="twoFA">
-            <span class="slider"></span>
-        </label>
-        <span><?= $t['enable_2fa'] ?? 'Enable 2FA' ?></span>
+        <form action="../control/user_control.php" method="post">
+            <!-- On envoie le mode en hidden pour savoir si on active ou désactive -->
+            <input type="hidden" name="mode" value="<?= ($_SESSION['mode'] ?? '') === '2FA' ? 'disable' : 'enable' ?>">
+            <!-- Le name du bouton correspond à ce que tu vérifies dans ton contrôleur -->
+            <button type="submit" name="toggle2FA" class="button">
+                <?= ($_SESSION['mode'] ?? '') === '2FA' 
+                    ? ($t['disable_2fa'] ?? 'Disable 2FA') 
+                    : ($t['enable_2fa'] ?? 'Enable 2FA') ?>
+            </button>
+        </form>
+        <!-- Message indiquant l'état actuel de 2FA -->
+        <p>
+            <?= ($_SESSION['mode'] ?? '') === '2FA' 
+                ? ($t['2fa_enabled'] ?? 'Two-factor authentication is enabled.') 
+                : ($t['2fa_disabled'] ?? 'Two-factor authentication is disabled.') ?>
+        </p>
     </div>
-
 </div>
-
 </body>
 </html>

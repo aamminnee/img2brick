@@ -37,6 +37,9 @@ include __DIR__ . '/header.php';
     </style>
 </head>
 <body>
+<a href="../views/images_views.php" class="button">
+    <?= $t['back'] ?? 'back' ?>
+</a>
 <div class="setting-container">
     <h1><?= $t['setting_title'] ?? 'Settings' ?></h1>
 

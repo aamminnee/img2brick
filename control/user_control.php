@@ -28,19 +28,28 @@ class UserController {
 
     // Login
     public function login() {
-        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['username']) && isset($_POST['password'])) {
-            $username = $_POST['username'];
+        if (session_status() === PHP_SESSION_NONE) session_start();
+        session_regenerate_id(true);
+        if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['username']) && !empty($_POST['password'])) {
+            $username = trim($_POST['username']);
             $password = $_POST['password'];
             $user = $this->user_model->getUserByUsername($username);
             if ($user && password_verify($password, $user['mdp'])) {
                 $_SESSION['username'] = $username;
-                $_SESSION['user_id'] = $user['id_user'];
-                $_SESSION['email'] = $this->user_model->getEmaiById($_SESSION['user_id'])['email']; 
-                $_SESSION['status'] = $this->user_model->getStatusById($_SESSION['user_id'])['etat']; 
+                $_SESSION['user_id']  = $user['id_user'];
+                $_SESSION['email']    = $this->user_model->getEmailById($user['id_user'])['email'];
+                $_SESSION['status']   = $this->user_model->getStatusById($user['id_user'])['etat'];
+                $_SESSION['mode'] = $this->user_model->getModeById($user['id_user']);
+                if ($_SESSION['mode'] === '2FA') {
+                    $token = $this->token_model->generateToken($user['id_user'], "2FA");
+                    $this->sendVerificationEmail($_SESSION['email'], $token);
+                    include __DIR__ . '/../views/verify_views.php';
+                    return;
+                }
                 header("Location: ../views/images_views.php");
                 exit;
             } else {
-                $message = "Incorrect username or password";
+                $message = "Nom d'utilisateur ou mot de passe incorrect.";
                 include __DIR__ . '/../views/login_views.php';
             }
         } else {
@@ -108,7 +117,6 @@ class UserController {
         include __DIR__ . '/../views/verify_views.php';
     }
 
-
     public function tokenForm() {
         if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['token'])) {
             $token = $_POST['token'];
@@ -121,8 +129,13 @@ class UserController {
                     $this->user_model->activateUser($token_data['id_user']);
                     $_SESSION['status'] = $this->user_model->getStatusById($_SESSION['user_id'])['etat'];
                     header("Location: ../views/images_views.php");
+                    exit;
                 } elseif ($token_data['types'] === 'reinitialisation') {
                     header("Location: ../views/reset_password_views.php");
+                    exit;
+                } elseif ($token_data['types'] === '2FA') {
+                    header("Location: ../views/images_views.php");
+                    exit;
                 }
             } else {
                 $message = "Code invalide ou expiré.";
@@ -153,6 +166,30 @@ class UserController {
         }
     }
 
+    public function toggle2FA() {
+        if (!isset($_SESSION['user_id'])) {
+            header("Location: ../views/login_views.php");
+            exit;
+        }
+
+        $id_user = $_SESSION['user_id'];
+        $action = $_POST['mode'] ?? '';
+
+        if ($action === 'enable') {
+            $this->user_model->setModeById($id_user, '2FA');
+            $_SESSION['mode'] = '2FA';
+            $message = "Two-factor authentication enabled.";
+        } elseif ($action === 'disable') {
+            $this->user_model->setModeById($id_user, null);
+            $_SESSION['mode'] = null;
+            $message = "Two-factor authentication disabled.";
+        } else {
+            $message = "Invalid request.";
+        }
+        include __DIR__ . '/../views/setting_views.php';
+    }
+
+
     // Logout
     public function logout() {
         session_unset();
@@ -173,6 +210,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $controller->register();
     } elseif (isset($_POST['reset_password'])) {
         $controller->resetPasswordForm();
+    } elseif (isset($_POST['toggle2FA'])) {
+        $controller->toggle2FA();
     }
 }
 
@@ -188,10 +227,8 @@ if (isset($_GET['action'])) {
         case 'resetPassword':
             $controller->resetPassword();
             break;
-        case 'resetEmail':
-            $controller->resetEmail();
-            break;
         case 'validateEmail':
             $controller->validateEmail();
+            break;
     }
 }

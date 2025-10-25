@@ -18,6 +18,7 @@ class UsersModel {
         return $res->fetch_assoc();
     }
 
+    // get username by id
     public function getUsernameById($id_user) {
         $request = mysqli_prepare($this->conn, "SELECT username FROM users WHERE id_user = ?");
         mysqli_stmt_bind_param($request, "i", $id_user);
@@ -59,11 +60,29 @@ class UsersModel {
     }
 
     // get user email by id
-    public function getEmaiById($id_user) {
+    public function getEmailById($id_user) {
         $request = mysqli_prepare($this->conn, "SELECT email FROM users WHERE id_user = ?");
         mysqli_stmt_bind_param($request, "i", $id_user);
         mysqli_stmt_execute($request);
         $res = mysqli_stmt_get_result($request);
         return $res->fetch_assoc();
     }
+
+    // get user mode by id
+    public function getModeById($id_user) {
+        $request = mysqli_prepare($this->conn, "SELECT mode FROM users WHERE id_user = ?");
+        mysqli_stmt_bind_param($request, "i", $id_user);
+        mysqli_stmt_execute($request);
+        $res = mysqli_stmt_get_result($request);
+        $row = $res->fetch_assoc();
+        return $row ? $row['mode'] : null;
+    }
+
+    // set user mode by id
+    public function setModeById($id_user, $mode) {
+        $request = mysqli_prepare($this->conn, "UPDATE users SET mode = ? WHERE id_user = ?");
+        mysqli_stmt_bind_param($request, "si", $mode, $id_user);
+        return mysqli_stmt_execute($request);
+    }
+
 }
