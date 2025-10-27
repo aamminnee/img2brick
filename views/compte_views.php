@@ -114,16 +114,13 @@ require_once __DIR__ . '/../models/images_models.php';
     <div class="section">
         <h3><?= $t['two_factor_auth'] ?? 'Two-Factor Authentication' ?></h3>
         <form action="../control/user_control.php" method="post">
-            <!-- On envoie le mode en hidden pour savoir si on active ou désactive -->
             <input type="hidden" name="mode" value="<?= ($_SESSION['mode'] ?? '') === '2FA' ? 'disable' : 'enable' ?>">
-            <!-- Le name du bouton correspond à ce que tu vérifies dans ton contrôleur -->
             <button type="submit" name="toggle2FA" class="button">
                 <?= ($_SESSION['mode'] ?? '') === '2FA' 
                     ? ($t['disable_2fa'] ?? 'Disable 2FA') 
                     : ($t['enable_2fa'] ?? 'Enable 2FA') ?>
             </button>
         </form>
-        <!-- Message indiquant l'état actuel de 2FA -->
         <p>
             <?= ($_SESSION['mode'] ?? '') === '2FA' 
                 ? ($t['2fa_enabled'] ?? 'Two-factor authentication is enabled.') 
