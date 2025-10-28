@@ -1,47 +1,59 @@
 <?php
-ini_set('display_errors', 1);
-error_reporting(E_ALL);
+session_start();
+header("Content-Type: application/json");
+require_once __DIR__ . '/../models/images_models.php';
 
 class CropImageController {
-    private string $uploadDir;
+    private $model;
+    private $uploadDir;
 
     public function __construct() {
+        $this->model = new ImagesModel();
         $this->uploadDir = __DIR__ . '/../uploads/';
     }
 
-    public function handleCropUpload(): void {
-        header('Content-Type: application/json');
-
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST' || !isset($_FILES['cropped_image'])) {
-            $this->respond('error', 'No image received.');
-            return;
+    public function processCrop() {
+        if (!isset($_SESSION['user_id']) || ($_SESSION['status'] ?? '') !== 'valide') {
+            echo json_encode(["status" => "error", "message" => "Accès refusé."]);
+            exit;
         }
 
-        $originalName = $_POST['original_name'] ?? 'image.png';
-        $newName = 'cropped_' . basename($originalName);
-        $targetPath = $this->uploadDir . $newName;
+        $user_id = $_SESSION['user_id'];
 
-        if (!is_dir($this->uploadDir)) {
-            mkdir($this->uploadDir, 0777, true);
+        if (!isset($_FILES['cropped_image']) || !isset($_POST['original_name'])) {
+            echo json_encode(["status" => "error", "message" => "Paramètres manquants."]);
+            exit;
         }
 
-        if (move_uploaded_file($_FILES['cropped_image']['tmp_name'], $targetPath)) {
-            $this->respond('success', 'Cropped image saved successfully.', $newName);
-        } else {
-            $this->respond('error', 'Failed to save cropped image.');
-        }
-    }
+        $originalName = basename($_POST['original_name']);
+        $cropped = $_FILES['cropped_image'];
 
-    private function respond(string $status, string $message, string $file = ''): void {
-        echo json_encode([
-            'status' => $status,
-            'message' => $message,
-            'file' => $file
-        ]);
+        // Si aucun crop effectué, on renvoie le fichier original
+        if ($cropped['size'] === 0) {
+            echo json_encode(["status" => "success", "file" => $originalName]);
+            exit;
+        }
+
+        // Nouveau nom unique
+        $ext = pathinfo($cropped['name'], PATHINFO_EXTENSION);
+        $newName = uniqid('img_crop_', true) . '.' . $ext;
+        $newPath = $this->uploadDir . $newName;
+
+        if (!move_uploaded_file($cropped['tmp_name'], $newPath)) {
+            echo json_encode(["status" => "error", "message" => "Erreur lors de l'enregistrement du recadrage."]);
+            exit;
+        }
+
+        // Supprimer l’ancienne image
+        $this->model->deleteImageFile($originalName);
+
+        // Mettre à jour la base
+        $this->model->updateImage($originalName, $newName, $user_id);
+
+        echo json_encode(["status" => "success", "file" => $newName]);
         exit;
     }
 }
 
 $controller = new CropImageController();
-$controller->handleCropUpload();
-?>  
+$controller->processCrop();
