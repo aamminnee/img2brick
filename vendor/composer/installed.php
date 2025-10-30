@@ -3,7 +3,7 @@
         'name' => 'img2brick/project',
         'pretty_version' => 'dev-master',
         'version' => 'dev-master',
-        'reference' => '54bb49a7fc09b668854f75cde1850133918e4f7d',
+        'reference' => '203741d36aa81e66c01cb2a952d38ac219e08510',
         'type' => 'project',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -22,7 +22,7 @@
         'img2brick/project' => array(
             'pretty_version' => 'dev-master',
             'version' => 'dev-master',
-            'reference' => '54bb49a7fc09b668854f75cde1850133918e4f7d',
+            'reference' => '203741d36aa81e66c01cb2a952d38ac219e08510',
             'type' => 'project',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),

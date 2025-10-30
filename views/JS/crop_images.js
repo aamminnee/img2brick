@@ -6,17 +6,6 @@ const warnings = document.getElementById('warnings');
 const aspectSelect = document.getElementById('aspect');
 const sizeSelect = document.getElementById('size');
 
-// translation messages from php
-// these variables must be injected via PHP in the page that includes this JS
-// example in crop_images_views.php:
-// <script>const t = <?= json_encode([
-//   'large_image_warning' => $t['large_image_warning'] ?? 'The image is very large. It may be resized for better performance.',
-//   'no_crop_applied' => $t['no_crop_applied'] ?? 'No crop applied, original image kept.',
-//   'crop_success' => $t['crop_success'] ?? 'Image successfully cropped!',
-//   'error_prefix' => $t['error_prefix'] ?? 'Error:',
-//   'processing' => $t['processing'] ?? 'Processing...'
-// ]) ?>;</script>
-
 // initialize cropper.js
 let cropper = new Cropper(image, {
     aspectRatio: NaN, // free by default
@@ -28,7 +17,7 @@ let cropper = new Cropper(image, {
 // check if image is too large
 image.onload = () => {
     if (image.naturalWidth > 3000 || image.naturalHeight > 3000) {
-        warnings.textContent = t.large_image_warning;
+        warnings.textContent = "The image is very large. It may be resized for better performance.";
     }
 };
 
@@ -40,7 +29,7 @@ aspectSelect.addEventListener('change', () => {
 
 // handle crop button click
 cropButton.addEventListener('click', () => {
-    message.textContent = t.processing;
+    message.textContent = "Processing...";
     warnings.textContent = "";
 
     const canvasData = cropper.getCroppedCanvas();
@@ -49,7 +38,7 @@ cropButton.addEventListener('click', () => {
 
     // if no crop applied
     if (canvasData.width === originalWidth && canvasData.height === originalHeight) {
-        message.textContent = t.no_crop_applied;
+        message.textContent = "No crop applied, original image kept.";
         window.location.href = "review_images_views.php?img=" + encodeURIComponent(image.dataset.originalName);
         return;
     }
@@ -68,14 +57,14 @@ cropButton.addEventListener('click', () => {
         .then(res => res.json())
         .then(data => {
             if (data.status === 'success') {
-                message.textContent = t.crop_success;
+                message.textContent = "Image successfully cropped!";
                 window.location.href = "review_images_views.php?img=" + encodeURIComponent(data.file);
             } else {
-                message.textContent = t.error_prefix + data.message;
+                message.textContent = "Error: " + data.message;
             }
         })
         .catch(err => {
-            message.textContent = t.error_prefix + err.message;
+            message.textContent = "Error: " + err.message;
         });
     });
 });
