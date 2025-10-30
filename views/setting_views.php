@@ -1,8 +1,9 @@
 <?php 
-include __DIR__ . '/header.php'; 
+include __DIR__ . '/header.php'; // load header and translations
 ?>
+
 <!DOCTYPE html>
-<html lang="<?= $_SESSION['lang'] ?? 'fr' ?>">
+<html lang="<?= $_SESSION['lang'] ?? 'en' ?>">
 <head>
     <meta charset="UTF-8">
     <title><?= $t['setting_title'] ?? 'Settings' ?></title>
@@ -38,15 +39,15 @@ include __DIR__ . '/header.php';
 </head>
 <body>
 <a href="../views/images_views.php" class="button">
-    <?= $t['back'] ?? 'back' ?>
+    <?= $t['back'] ?? 'Back' ?>
 </a>
 <div class="setting-container">
     <h1><?= $t['setting_title'] ?? 'Settings' ?></h1>
 
     <div class="setting-item">
         <h3><?= $t['language'] ?? 'Language' ?></h3>
-        <a href="?action=setLanguage&lang=fr" class="button">Français</a>
-        <a href="?action=setLanguage&lang=en" class="button">English</a>
+        <a href="?action=setLanguage&lang=fr" class="button"><?= $t['french'] ?? 'French' ?></a>
+        <a href="?action=setLanguage&lang=en" class="button"><?= $t['english'] ?? 'English' ?></a>
     </div>
 
     <div class="setting-item">

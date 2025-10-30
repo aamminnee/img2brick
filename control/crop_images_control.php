@@ -13,44 +13,70 @@ class CropImageController {
     }
 
     public function processCrop() {
+        // check user session
         if (!isset($_SESSION['user_id']) || ($_SESSION['status'] ?? '') !== 'valide') {
-            echo json_encode(["status" => "error", "message" => "Accès refusé."]);
+            echo json_encode([
+                "status" => "error",
+                "message" => $t['access_denied'] ?? "Access denied."
+            ]);
             exit;
         }
 
         $user_id = $_SESSION['user_id'];
 
+        // check required parameters
         if (!isset($_FILES['cropped_image']) || !isset($_POST['original_name'])) {
-            echo json_encode(["status" => "error", "message" => "Paramètres manquants."]);
+            echo json_encode([
+                "status" => "error",
+                "message" => $t['missing_parameters'] ?? "Missing parameters."
+            ]);
             exit;
         }
 
         $originalName = basename($_POST['original_name']);
         $cropped = $_FILES['cropped_image'];
 
-        // Si aucun crop effectué, on renvoie le fichier original
+        // if no crop (unchanged image)
         if ($cropped['size'] === 0) {
-            echo json_encode(["status" => "success", "file" => $originalName]);
+            echo json_encode([
+                "status" => "success",
+                "file" => $originalName
+            ]);
             exit;
         }
 
-        // Nouveau nom unique
+        // generate unique file name
         $ext = pathinfo($cropped['name'], PATHINFO_EXTENSION);
         $newName = uniqid('img_crop_', true) . '.' . $ext;
         $newPath = $this->uploadDir . $newName;
 
+        // move cropped file to uploads/
         if (!move_uploaded_file($cropped['tmp_name'], $newPath)) {
-            echo json_encode(["status" => "error", "message" => "Erreur lors de l'enregistrement du recadrage."]);
+            echo json_encode([
+                "status" => "error",
+                "message" => $t['crop_save_error'] ?? "Error saving cropped image."
+            ]);
             exit;
         }
 
-        // Supprimer l’ancienne image
+        // delete old file from uploads/
         $this->model->deleteImageFile($originalName);
 
-        // Mettre à jour la base
-        $this->model->updateImage($originalName, $newName, $user_id);
+        // update database with new file name
+        $updateResult = $this->model->updateImage($originalName, $newName, $user_id);
 
-        echo json_encode(["status" => "success", "file" => $newName]);
+        if ($updateResult) {
+            echo json_encode([
+                "status" => "success",
+                "file" => $newName
+            ]);
+        } else {
+            echo json_encode([
+                "status" => "error",
+                "message" => $t['db_update_error'] ?? "Error updating database."
+            ]);
+        }
+
         exit;
     }
 }

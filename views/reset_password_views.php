@@ -1,32 +1,35 @@
-<?php 
-if (isset($message)) echo "<p>$message</p>"; 
-Require_once __DIR__ . '/header.php';
+<?php
+if (isset($message)) echo "<p>$message</p>";
+require_once __DIR__ . '/header.php'; // load header and translations
 ?>
+
 <!DOCTYPE html>
-<html lang="<?= $_SESSION['lang'] ?? 'fr' ?>">
+<html lang="<?= $_SESSION['lang'] ?? 'en' ?>">
 <head>
-    <meta charset="UTF-8">
-    <title><?= $t['reset_password_title'] ?? 'Reset your password' ?></title>  
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: <?= ($_SESSION['theme'] ?? 'light') === 'dark' ? '#121212' : '#f5f5f5' ?>;
-            color: <?= ($_SESSION['theme'] ?? 'light') === 'dark' ? '#fff' : '#000' ?>;
-            transition: all 0.3s ease;
-          }
-    </style> 
+<meta charset="UTF-8">
+<title><?= $t['reset_password_title'] ?? 'Reset your password' ?></title>
+<style>
+body {
+    font-family: Arial, sans-serif;
+    background-color: <?= ($_SESSION['theme'] ?? 'light') === 'dark' ? '#121212' : '#f5f5f5' ?>;
+    color: <?= ($_SESSION['theme'] ?? 'light') === 'dark' ? '#fff' : '#000' ?>;
+    transition: all 0.3s ease;
+}
+</style>
 </head>
 <body>
-    <h2><?= $t['reset_password_header'] ?? 'Reset Password' ?></h2>
 
-    <form action="../control/user_control.php" method="post">
-        <label for="password"><?= $t['new_password_label'] ?? 'New password' ?></label>
-        <input type="password" name="password" id="password" required>
+<h2><?= $t['reset_password_header'] ?? 'Reset Password' ?></h2>
 
-        <label for="password_confirm"><?= $t['confirm_password_label'] ?? 'Confirm password' ?></label>
-        <input type="password" name="password_confirm" id="password_confirm" required>
+<form action="../control/user_control.php" method="post">
+    <label for="password"><?= $t['new_password_label'] ?? 'New password' ?></label>
+    <input type="password" name="password" id="password" required>
 
-        <button type="submit" name="reset_password"><?= $t['reset_password_button'] ?? 'Reset' ?></button>
-    </form>
+    <label for="password_confirm"><?= $t['confirm_password_label'] ?? 'Confirm password' ?></label>
+    <input type="password" name="password_confirm" id="password_confirm" required>
+
+    <button type="submit" name="reset_password"><?= $t['reset_password_button'] ?? 'Reset' ?></button>
+</form>
+
 </body>
 </html>

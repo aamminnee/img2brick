@@ -3,10 +3,11 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
+// load translation model
 require_once __DIR__ . '/../models/translation_models.php';
 
-// Chargement dynamique des traductions selon la langue choisie
-$lang = $_SESSION['lang'] ?? 'fr';
+// load translations dynamically according to chosen language
+$lang = $_SESSION['lang'] ?? 'en';
 $theme = $_SESSION['theme'] ?? 'light';
 $translationModel = new TranslationModel();
 $t = $translationModel->getTranslations($lang);
@@ -17,6 +18,7 @@ $t = $translationModel->getTranslations($lang);
 <head>
     <meta charset="UTF-8">
     <style>
+        /* base style and theme adaptation */
         body {
             font-family: 'Segoe UI', Arial, sans-serif;
             background-color: <?= $theme === 'dark' ? '#121212' : '#f5f5f5' ?>;
@@ -25,6 +27,7 @@ $t = $translationModel->getTranslations($lang);
             padding: 0;
         }
 
+        /* header layout */
         header {
             background-color: <?= $theme === 'dark' ? '#1e1e1e' : '#ffffff' ?>;
             color: <?= $theme === 'dark' ? '#f0f0f0' : '#222' ?>;
@@ -40,6 +43,7 @@ $t = $translationModel->getTranslations($lang);
             margin: 5px 10px;
         }
 
+        /* link styling */
         a {
             color: <?= $theme === 'dark' ? '#4da6ff' : '#0078d7' ?>;
             text-decoration: none;
@@ -73,22 +77,22 @@ $t = $translationModel->getTranslations($lang);
 <body>
 <header>
     <div class="header-left">
-        <a href="../views/images_views.php"><?= $t['home'] ?? 'Accueil' ?></a>
-        <a href="../views/compte_views.php"><?= $t['my_account'] ?? 'Mon Compte' ?></a>
-        <a href="../control/setting_control.php"><?= $t['setting_title'] ?? 'Paramètres' ?></a>
+        <a href="../views/images_views.php"><?= $t['home'] ?? 'Home' ?></a>
+        <a href="../views/compte_views.php"><?= $t['my_account'] ?? 'My Account' ?></a>
+        <a href="../control/setting_control.php"><?= $t['setting_title'] ?? 'Settings' ?></a>
     </div>
 
     <div class="header-right">
         <?php if (isset($_SESSION['username'])): ?>
             <span>
-                <?= $t['logged_in_as'] ?? 'Connecté en tant que' ?> :
+                <?= $t['logged_in_as'] ?? 'Logged in as' ?> :
                 <span class="username"><?= htmlspecialchars($_SESSION['username']) ?></span>
             </span>
             |
-            <a href="../control/user_control.php?action=logout"><?= $t['logout'] ?? 'Déconnexion' ?></a>
+            <a href="../control/user_control.php?action=logout"><?= $t['logout'] ?? 'Logout' ?></a>
         <?php else: ?>
-            <a href="../views/login_views.php"><?= $t['login'] ?? 'Connexion' ?></a>
-            <a href="../views/register_views.php"><?= $t['register'] ?? 'Inscription' ?></a>
+            <a href="../views/login_views.php"><?= $t['login'] ?? 'Login' ?></a>
+            <a href="../views/register_views.php"><?= $t['register'] ?? 'Register' ?></a>
         <?php endif; ?>
     </div>
 </header>

@@ -4,33 +4,37 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 include __DIR__ . '/header.php';
 
+//security check: ensure user is logged in and validated
 if (!isset($_SESSION['user_id']) || ($_SESSION['status'] ?? '') !== 'valide') {
-    echo "Accès refusé.";
+    echo $t['access_denied'] ?? "Access denied.";
     exit;
 }
 
+//check if an image is provided
 if (!isset($_GET['img'])) {
-    echo "Aucune image sélectionnée.";
+    echo $t['no_image_selected'] ?? "No image selected.";
     exit;
 }
 
 $image = $_GET['img'];
 $uploadDir = __DIR__ . '/../uploads/';
 
+//verify that image exists
 if (!file_exists($uploadDir . $image)) {
-    echo "Image introuvable.";
+    echo $t['image_not_found'] ?? "Image not found.";
     exit;
 }
 
 $imagePath = "../uploads/" . htmlspecialchars($image);
 ?>
+
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="<?= $_SESSION['lang'] ?? 'en' ?>">
 <head>
     <meta charset="UTF-8">
-    <title>Prévisualisation et Recadrage</title>
+    <title><?= $t['crop_preview_title'] ?? 'Crop and Preview' ?></title>
 
-    <!-- Cropper.js -->
+    <!-- cropper.js -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.js"></script>
 
@@ -56,7 +60,7 @@ $imagePath = "../uploads/" . htmlspecialchars($image);
             overflow: hidden;
         }
 
-        /* Zone principale */
+        //main area
         #main-container {
             flex: 3;
             display: flex;
@@ -93,7 +97,7 @@ $imagePath = "../uploads/" . htmlspecialchars($image);
 
         #message { text-align: center; margin-top: 15px; font-weight: bold; }
 
-        /* Panneau latéral */
+        //side panel
         #options-panel {
             flex: 1;
             background-color: <?= ($_SESSION['theme'] ?? 'light') === 'dark' ? '#1e1e1e' : '#ffffff' ?>;
@@ -114,41 +118,40 @@ $imagePath = "../uploads/" . htmlspecialchars($image);
 
 <body>
     <header>
-        <!-- Header inclus avec include 'header.php' -->
+        <!-- header included via include 'header.php' -->
     </header>
 
     <main>
-        <!-- Zone principale -->
+        <!-- main area -->
         <div id="main-container">
-            <h2>Recadrez votre image</h2>
+            <h2><?= $t['crop_your_image'] ?? 'Crop your image' ?></h2>
             <div id="image-container">
-                <img id="image" src="<?= $imagePath ?>" data-original-name="<?= htmlspecialchars($image) ?>" alt="Image à recadrer">
+                <img id="image" src="<?= $imagePath ?>" data-original-name="<?= htmlspecialchars($image) ?>" alt="<?= $t['image_to_crop'] ?? 'Image to crop' ?>">
             </div>
 
-            <button id="cropButton">Appliquer et Continuer</button>
+            <button id="cropButton"><?= $t['apply_continue'] ?? 'Apply and Continue' ?></button>
             <div id="message"></div>
         </div>
 
-        <!-- Panneau latéral -->
         <aside id="options-panel">
-            <h3>Options de rendu</h3>
+            <h3><?= $t['render_options'] ?? 'Render Options' ?></h3>
 
             <div class="option-group">
-                <label for="size">Taille du tableau :</label>
+                <label for="size"><?= $t['board_size'] ?? 'Board size:' ?></label>
                 <select id="size">
-                    <option value="32">32 x 32 tenons</option>
-                    <option value="64">64 x 64 tenons</option>
-                    <option value="96">96 x 96 tenons</option>
+                    <option value="32"><?= $t['size_32'] ?? '32 x 32 studs' ?></option>
+                    <option value="64"><?= $t['size_64'] ?? '64 x 64 studs' ?></option>
+                    <option value="96"><?= $t['size_96'] ?? '96 x 96 studs' ?></option>
                 </select>
             </div>
 
             <div class="option-group">
-                <label for="aspect">Ratio de recadrage :</label>
+                <label for="aspect"><?= $t['crop_ratio'] ?? 'Crop ratio:' ?></label>
                 <select id="aspect">
-                    <option value="NaN">Libre</option>
-                    <option value="1">Carré (1:1)</option>
-                    <option value="4/3">4:3</option>
-                    <option value="16/9">16:9</option>
+                    <option value="NaN"><?= $t['ratio_free'] ?? 'Free' ?></option>
+                    <option value="1"><?= $t['ratio_square'] ?? 'Square (1:1)' ?></option>
+                    <option value="4/3"><?= $t['ratio_43'] ?? '4:3' ?></option>
+                    <option value="16/9"><?= $t['ratio_169'] ?? '16:9' ?></option>
                 </select>
             </div>
 

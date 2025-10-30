@@ -1,19 +1,17 @@
 <?php
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
+if (session_status() === PHP_SESSION_NONE) session_start(); // start session if not already started
 ?>
 
 <!DOCTYPE html>
-<html lang="<?= $_SESSION['lang'] ?? 'fr' ?>">
+<html lang="<?= $_SESSION['lang'] ?? 'en' ?>">
 <head>
     <meta charset="UTF-8">
     <title><?= $t['verify_title'] ?? 'Account Verification' ?></title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: <?= ($_SESSION['theme'] ?? 'light') === 'dark' ? '#121212' : '#f5f5f5' ?>;
-            color: <?= ($_SESSION['theme'] ?? 'light') === 'dark' ? '#fff' : '#000' ?>;
+            background-color: <?= ($_SESSION['theme'] ?? 'light')==='dark' ? '#121212' : '#f5f5f5' ?>;
+            color: <?= ($_SESSION['theme'] ?? 'light')==='dark' ? '#fff' : '#000' ?>;
             transition: all 0.3s ease;
             display: flex;
             flex-direction: column;
@@ -39,14 +37,16 @@ if (session_status() === PHP_SESSION_NONE) {
 <body>
     <h2><?= $t['verify_header'] ?? 'Enter your verification code' ?></h2>
 
-    <?php if (isset($message)) echo "<p>$message</p>"; ?>
+    <?php if (isset($message)) echo "<p>$message</p>"; // show message if exists ?>
 
     <form action="../control/user_control.php?action=tokenForm" method="post">
         <input type="text" name="token" maxlength="6" required 
                placeholder="<?= $t['verify_placeholder'] ?? '6 digits' ?>">
         <button type="submit"><?= $t['verify_button'] ?? 'Validate' ?></button>
     </form>
+
     <?php
+        // show login link if status not valid
         if (!isset($_SESSION['status']) || $_SESSION['status'] == 'invalide') {
             echo '<p><a href="../views/login_views.php">' . ($t['login_link_text'] ?? 'Go to Login') . '</a></p>';
         }

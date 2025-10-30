@@ -1,5 +1,7 @@
+// class to handle drag & drop, paste, and file selection
 class DragDropController {
     constructor(isValidUser) {
+        // DOM elements
         this.dropZone = document.getElementById("drop-zone");
         this.fileInput = document.getElementById("fileInput");
         this.fileLabel = document.getElementById("fileLabel");
@@ -13,55 +15,68 @@ class DragDropController {
         this.setupEvents();
     }
 
+    // setup all event listeners
     setupEvents() {
-        // Drag & Drop
-        this.dropZone.addEventListener("dragover", e => { e.preventDefault(); this.dropZone.classList.add("dragover"); });
+        // drag & drop events
+        this.dropZone.addEventListener("dragover", e => { 
+            e.preventDefault(); 
+            this.dropZone.classList.add("dragover"); 
+        });
         this.dropZone.addEventListener("dragleave", () => this.dropZone.classList.remove("dragover"));
         this.dropZone.addEventListener("drop", e => {
-            e.preventDefault(); this.dropZone.classList.remove("dragover");
-            const file = e.dataTransfer.files[0]; if(file) this.handleFile(file);
+            e.preventDefault(); 
+            this.dropZone.classList.remove("dragover");
+            const file = e.dataTransfer.files[0]; 
+            if(file) this.handleFile(file);
         });
 
-        // Paste
+        // paste events
         document.addEventListener("paste", e => {
             const items = e.clipboardData.items;
-            for(let i=0;i<items.length;i++){
-                if(items[i].kind==="file"){
-                    this.handleFile(items[i].getAsFile()); break;
+            for(let i=0; i<items.length; i++){
+                if(items[i].kind === "file"){
+                    this.handleFile(items[i].getAsFile()); 
+                    break;
                 }
             }
         });
 
-        // File selection
-        this.fileInput.addEventListener("change", e => { const file = e.target.files[0]; if(file) this.handleFile(file); });
+        // file input change
+        this.fileInput.addEventListener("change", e => { 
+            const file = e.target.files[0]; 
+            if(file) this.handleFile(file); 
+        });
 
-        // Continue button
+        // continue button
         this.continueButton.addEventListener("click", () => {
-            if(!this.selectedFile){ this.showError("Aucune image sélectionnée."); return; }
-            if(!this.isValidUser){ this.showError("Vous devez être connecté et validé pour déposer une image."); return; }
+            if(!this.selectedFile){ this.showError('no_file_selected'); return; }
+            if(!this.isValidUser){ this.showError('login_required'); return; }
             this.uploadFile();
         });
     }
 
+    // handle a selected file
     handleFile(file) {
-        const allowedTypes=["image/jpeg","image/png","image/webp"];
-        const maxSize=2*1024*1024;
+        const allowedTypes = ["image/jpeg","image/png","image/webp"];
+        const maxSize = 2*1024*1024; // 2MB
 
-        this.message.textContent=""; this.message.style.color="black";
+        this.message.textContent = ""; 
+        this.message.style.color = "black";
 
-        if(!allowedTypes.includes(file.type)){ this.showError("Type de fichier non supporté. Formats : JPG, PNG, WEBP."); return; }
-        if(file.size>maxSize){ this.showError("Image trop volumineuse (>2 Mo)."); return; }
+        if(!allowedTypes.includes(file.type)){ this.showError('unsupported_type'); return; }
+        if(file.size > maxSize){ this.showError('file_too_large'); return; }
 
         const img = new Image();
         img.onload = () => {
-            if(img.width<512 || img.height<512){ this.showError("Image trop petite (min 512x512)."); return; }
+            if(img.width < 512 || img.height < 512){ this.showError('file_too_small'); return; }
 
+            // file is valid
             this.selectedFile = file;
-            this.message.textContent = "Image bien importée, cliquez sur Continuer.";
+            this.message.textContent = t.file_ok;
             this.message.style.color = "green";
             this.continueButton.style.display = "inline-block";
 
-            // Remove previous content and append image to drop-zone
+            // display preview
             this.dropZone.innerHTML = "";
             img.style.width = "100%";
             img.style.height = "100%";
@@ -72,31 +87,34 @@ class DragDropController {
         img.src = URL.createObjectURL(file);
     }
 
-
-    showError(msg){
-        this.message.textContent=msg;
-        this.message.style.color="red";
-        this.continueButton.style.display="none";
-        this.preview.style.display="none";
-        this.selectedFile=null;
+    // show an error message
+    showError(key){
+        this.message.textContent = t[key] || key;
+        this.message.style.color = "red";
+        this.continueButton.style.display = "none";
+        this.preview.style.display = "none";
+        this.selectedFile = null;
     }
 
+    // upload file to server
     uploadFile(){
-        const formData=new FormData();
+        const formData = new FormData();
         formData.append("image_input", this.selectedFile);
         formData.append("upload", true);
 
-        this.message.textContent="Téléversement en cours..."; this.message.style.color="orange";
+        this.message.textContent = t.uploading; 
+        this.message.style.color = "orange";
 
-        fetch("../control/images_control.php",{method:"POST",body:formData})
-        .then(res=>res.json())
-        .then(data=>{
-            if(data.status==="success"){
-                window.location.href="crop_images_views.php?img="+encodeURIComponent(data.file);
-            }else this.showError(data.message);
+        fetch("../control/images_control.php", { method: "POST", body: formData })
+        .then(res => res.json())
+        .then(data => {
+            if(data.status === "success"){
+                window.location.href = "crop_images_views.php?img=" + encodeURIComponent(data.file);
+            } else this.showError('error_prefix' + ' ' + data.message);
         })
-        .catch(err=>this.showError("Erreur : "+err));
+        .catch(err => this.showError('error_prefix' + ' ' + err));
     }
 }
 
-document.addEventListener("DOMContentLoaded",()=>{ new DragDropController(isValidUser); });
+// initialize controller on DOM ready
+document.addEventListener("DOMContentLoaded", () => { new DragDropController(isValidUser); });
