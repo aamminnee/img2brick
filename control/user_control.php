@@ -10,7 +10,7 @@ use PHPMailer\PHPMailer\Exception;
 use Dotenv\Dotenv;
 
 // load environment variables
-$dotenv = Dotenv::createImmutable(__DIR__ . '/../'); 
+$dotenv = Dotenv::createImmutable(__DIR__ . '/../');
 $dotenv->load();
 
 class UserController {
@@ -33,7 +33,7 @@ class UserController {
     }
 
     // helper for translations
-    private function t($key, $default='') {
+    private function t($key, $default = '') {
         return $this->translations[$key] ?? $default;
     }
 
@@ -42,33 +42,45 @@ class UserController {
         if (session_status() === PHP_SESSION_NONE) session_start();
         session_regenerate_id(true);
 
+        // if form submitted
         if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['username']) && !empty($_POST['password'])) {
+            // captcha validation (client-side-generated token)
+            // require both fields: captcha (user input) and captcha_token (generated token)
+            $userCaptcha = $_POST['captcha'] ?? '';
+            $token = $_POST['captcha_token'] ?? '';
+
+            if (empty($token) || empty($userCaptcha) || strcasecmp(trim($userCaptcha), trim($token)) !== 0) {
+                // captcha invalid
+                $message = $this->t('captcha_invalid', "Incorrect captcha. Please try again.");
+                include __DIR__ . '/../views/login_views.php';
+                return;
+            }
+
+            // proced with normal authentication
             $username = trim($_POST['username']);
             $password = $_POST['password'];
             $user = $this->user_model->getUserByUsername($username);
-
             if ($user && password_verify($password, $user['mdp'])) {
                 $_SESSION['username'] = $username;
                 $_SESSION['user_id']  = $user['id_user'];
                 $_SESSION['email']    = $this->user_model->getEmailById($user['id_user'])['email'];
                 $_SESSION['status']   = $this->user_model->getStatusById($user['id_user'])['etat'];
-                $_SESSION['mode'] = $this->user_model->getModeById($user['id_user']);
-
+                $_SESSION['mode']     = $this->user_model->getModeById($user['id_user']);
                 if ($_SESSION['mode'] === '2FA') {
                     $token = $this->token_model->generateToken($user['id_user'], "2FA");
+                    print_r($token);
                     $this->sendVerificationEmail($_SESSION['email'], $token);
                     include __DIR__ . '/../views/verify_views.php';
                     return;
                 }
-
                 header("Location: ../views/images_views.php");
                 exit;
             } else {
-                // display translated error
                 $message = $this->t('login_error', "Incorrect username or password.");
                 include __DIR__ . '/../views/login_views.php';
             }
         } else {
+            // show login form
             include __DIR__ . '/../views/login_views.php';
         }
     }
@@ -81,7 +93,6 @@ class UserController {
             $password = $_POST['password'];
 
             if ($this->user_model->addUser($email, $username, $password)) {
-                // get the newly added user
                 $user = $this->user_model->getUserByUsername($username);
                 $token = $this->token_model->generateToken($user['id_user'], "validation");
                 $this->sendVerificationEmail($email, $token);
@@ -181,7 +192,12 @@ class UserController {
             $this->mail->addAddress($email);
             $this->mail->isHTML(true);
             $this->mail->Subject = $this->t('verification_code_subject', "Verification code");
-            $this->mail->Body    = $this->t('verification_code_body', "Your verification code is: <b>$token</b>");
+            $bodyTemplate = $this->t('verification_code_body', "Your verification code is: %TOKEN%");
+            if (empty($bodyTemplate)) {
+                $bodyTemplate = "Your verification code is: %TOKEN%";
+            }
+            $body = str_replace('%TOKEN%', $token, $bodyTemplate);
+            $this->mail->Body = $body;
             $this->mail->send();
         } catch (Exception $e) {
             echo $this->t('mail_error', "Error sending email: ") . $this->mail->ErrorInfo;
@@ -215,7 +231,7 @@ class UserController {
     public function logout() {
         session_unset();
         session_destroy();
-        header("Location: ../views/images_views.php"); 
+        header("Location: ../views/images_views.php");
         exit;
     }
 }
@@ -253,3 +269,4 @@ if (isset($_GET['action'])) {
             break;
     }
 }
+?>

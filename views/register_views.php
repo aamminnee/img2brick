@@ -32,6 +32,8 @@ body {
     <input type="password" name="password" id="password" required>
 
     <button type="submit" name="register"><?= $t['register_button'] ?? 'Register' ?></button>
+
+    <p><a href="login_views.php"><?= $t['login_link'] ?? "Already have an account? Log in here." ?></a></p>
 </form>
 
 </body>

@@ -29,6 +29,17 @@ class MosaicModel {
         return $mosaic ? $mosaic['id_mosaic'] : null;
     }
 
+    public function getMosaicById($mosaic_id) {
+        $sql = "SELECT * FROM mosaique WHERE id_mosaic = ?";
+        $stmt = mysqli_prepare($this->conn, $sql);
+        mysqli_stmt_bind_param($stmt, "i", $mosaic_id);
+        mysqli_stmt_execute($stmt);
+        $result = mysqli_stmt_get_result($stmt);
+        $mosaic = mysqli_fetch_assoc($result);
+        mysqli_stmt_close($stmt);
+        return $mosaic; // retourne false si non trouvé
+    }
+
     public function getMosaicByIdentifier($identifier) {
         $sql = "SELECT * FROM mosaique WHERE identifiant = ?";
         $stmt = mysqli_prepare($this->conn, $sql);

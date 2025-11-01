@@ -90,6 +90,7 @@ $t = $translationModel->getTranslations($lang);
             </span>
             |
             <a href="../control/user_control.php?action=logout"><?= $t['logout'] ?? 'Logout' ?></a>
+            <a href="../control/commande_control.php">commande</a>
         <?php else: ?>
             <a href="../views/login_views.php"><?= $t['login'] ?? 'Login' ?></a>
             <a href="../views/register_views.php"><?= $t['register'] ?? 'Register' ?></a>

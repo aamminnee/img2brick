@@ -29,7 +29,7 @@ class CommandeModel {
     }
 
     public function getCommandeById($commande_id) {
-        $sql = "SELECT * FROM commande WHERE id_commande = ?";
+        $sql = "SELECT * FROM commande NATURAL JOIN mosaique WHERE id_commande = ?";
         $stmt = mysqli_prepare($this->conn, $sql);
         mysqli_stmt_bind_param($stmt, "i", $commande_id);
         mysqli_stmt_execute($stmt);
@@ -38,5 +38,44 @@ class CommandeModel {
         mysqli_stmt_close($stmt);
         return $commande;
     }
+
+    public function getCommandeByUserId($user_id) {
+        $sql = "SELECT * FROM commande NATURAL JOIN mosaique WHERE id_user = ?";
+        $stmt = mysqli_prepare($this->conn, $sql);
+        mysqli_stmt_bind_param($stmt, "i", $user_id);
+        mysqli_stmt_execute($stmt);
+        $result = mysqli_stmt_get_result($stmt);
+        $commandes = [];
+        while ($row = mysqli_fetch_assoc($result)) {
+            $commandes[] = $row;
+        }
+        mysqli_stmt_close($stmt);
+        return $commandes;
+    }
+
+    public function getCommandeStatusById($id_commande) {
+        $sql = "SELECT date_commande FROM commande WHERE id_commande = ?";
+        $stmt = mysqli_prepare($this->conn, $sql);
+        mysqli_stmt_bind_param($stmt, "i", $id_commande);
+        mysqli_stmt_execute($stmt);
+        $result = mysqli_stmt_get_result($stmt);
+        $row = mysqli_fetch_assoc($result);
+        mysqli_stmt_close($stmt);
+        if (!$row || empty($row['date_commande'])) {
+            return "Inconnue";
+        }
+        $dateCommande = new DateTime($row['date_commande']);
+        $now = new DateTime();
+        $interval = $now->diff($dateCommande);
+        $days = (int)$interval->format('%a'); // numbers of days difference
+        if ($days < 2) {
+            return "En attente";
+        } elseif ($days < 7) {
+            return "Expédiée";
+        } else {
+            return "Livrée";
+        }
+    }
+
 }
 ?>
